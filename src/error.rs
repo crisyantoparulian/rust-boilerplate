@@ -36,12 +36,13 @@ impl IntoResponse for AppError {
 }
 
 
-impl From<crate::database::DatabaseError> for AppError {
-    fn from(err: crate::database::DatabaseError) -> Self {
+impl From<crate::domain::user::repository::RepositoryError> for AppError {
+    fn from(err: crate::domain::user::repository::RepositoryError) -> Self {
         match err {
-            crate::database::DatabaseError::NotFound => AppError::NotFound,
-            crate::database::DatabaseError::Validation(msg) => AppError::ValidationError(msg),
-            crate::database::DatabaseError::AlreadyExists => AppError::BadRequest(err.to_string()),
+            crate::domain::user::repository::RepositoryError::NotFound => AppError::NotFound,
+            crate::domain::user::repository::RepositoryError::AlreadyExists => AppError::BadRequest(err.to_string()),
+            crate::domain::user::repository::RepositoryError::Database(msg) => AppError::Internal(msg),
+            crate::domain::user::repository::RepositoryError::Internal(msg) => AppError::Internal(msg),
         }
     }
 }

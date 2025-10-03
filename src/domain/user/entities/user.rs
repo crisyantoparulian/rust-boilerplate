@@ -1,12 +1,10 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use validator::Validate;
+use chrono::{DateTime, Utc};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Validate)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     pub id: Uuid,
-    #[validate(email)]
     pub email: String,
     pub password_hash: String,
     pub created_at: DateTime<Utc>,
@@ -24,18 +22,4 @@ impl User {
             updated_at: now,
         }
     }
-}
-
-#[derive(Debug, Serialize, Deserialize, Validate)]
-pub struct CreateUserRequest {
-    #[validate(email)]
-    pub email: String,
-    pub password: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct UserResponse {
-    pub id: Uuid,
-    pub email: String,
-    pub created_at: DateTime<Utc>,
 }

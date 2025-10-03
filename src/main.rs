@@ -1,35 +1,26 @@
 mod config;
-mod database;
 mod error;
-mod handlers;
 mod middleware;
-mod models;
 mod response;
-mod routes;
-mod services;
+mod domain;
+mod infrastructure;
+mod delivery;
+mod container;
 
-use axum::Router;
 use config::Config;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use std::io;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
-    // Initialize tracing
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "info".into()),
-        )
-        .with(tracing_subscriber::fmt::layer())
-        .init();
+    // Initialize tracing using infrastructure logger
+    infrastructure::init_logger();
 
     // Load configuration
     let config = Config::from_env();
     tracing::info!("Starting server at {}:{}", config.server_host, config.server_port);
 
-    // Create router with all routes and services
-    let app = routes::create_routes()
+    // Create router with clean architecture layers
+    let app = delivery::create_routes()
         // Apply logging middleware layers
         .layer(axum::middleware::from_fn(middleware::security_logging_middleware))
         .layer(axum::middleware::from_fn(middleware::error_logging_middleware))
